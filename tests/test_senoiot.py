@@ -36,6 +36,16 @@ def test_normalization_accepts_vendor_seconds_timestamp():
     assert item["sample_time"] == (now // 1000) * 1000
 
 
+def test_normalization_accepts_vendor_clock_skew_up_to_thirty_minutes():
+    now = int(time.time() * 1000)
+    # ~8 minutes ahead (observed on live Senoiot gateways) must ingest.
+    skewed = normalized(sample(now + 8 * 60 * 1000), "station", now)
+    assert skewed["sample_time"] == now
+    # Beyond 30 minutes still rejected.
+    with pytest.raises(VendorError, match="采集时间异常"):
+        normalized(sample(now + 31 * 60 * 1000), "station", now)
+
+
 def test_default_stale_window_is_thirty_minutes(monkeypatch):
     """厂商读数在采集后 30 分钟内均按正常实时数据处理。"""
     from backend.senoiot import from_environment

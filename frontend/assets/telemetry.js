@@ -11,7 +11,11 @@
     const requestUrl = (global.FarmApiBase && global.FarmApiBase.apiUrl)
       ? global.FarmApiBase.apiUrl(path)
       : path;
-    const response = await fetch(requestUrl, {cache:"no-store", signal:AbortSignal.timeout(15000)});
+    const opts = {cache: "no-store"};
+    if (global.AbortSignal && typeof AbortSignal.timeout === "function") {
+      opts.signal = AbortSignal.timeout(15000);
+    }
+    const response = await fetch(requestUrl, opts);
     if (!response.ok) throw new Error(`数据服务暂不可用（${response.status}）`);
     return response.json();
   }
@@ -52,18 +56,23 @@
   function cards(devices, compact) {
     if (!devices.length) return '<p class="tl-empty">等待厂家设备列表和首次采集。未收到数据时不会填入仿真读数。</p>';
     return devices.map(d => {
-      const readings = visibleReadings(d.readings).filter(r => !r.stale);
+      const all = visibleReadings(d.readings);
+      const fresh = all.filter(r => !r.stale);
+      // Prefer live samples; if every point is stale, still show the latest
+      // manufacturer readings (real history) instead of an empty card.
+      const readings = fresh.length ? fresh : all;
+      const showingStaleOnly = !fresh.length && all.length > 0;
       const image = readings.find(r => r.property === "pestImage");
       const metrics = readings.filter(r => r.property !== "pestImage");
       return `<article class="tl-device${/虫情|Infestation/i.test(`${d.name || ""}${d.product_id || ""}`) ? " tl-pest" : ""}">
-      <div class="tl-row"><h3>${esc(d.name)}</h3><span class="tl-tag ${d.status_stale ? "tl-warn" : ""}">${esc(d.status_stale ? "在线状态待更新" : d.online)}</span></div>
+      <div class="tl-row"><h3>${esc(d.name)}</h3><span class="tl-tag ${d.status_stale || showingStaleOnly ? "tl-warn" : ""}">${esc(showingStaleOnly ? "最近读数（已过期）" : (d.status_stale ? "在线状态待更新" : d.online))}</span></div>
       <div class="tl-meta">${esc(d.did)} · ${esc(d.location)}</div>
       ${!compact && image ? readingValue(image) : ""}
-      <div class="tl-readings">${metrics.length ? metrics.map(r=>`<div class="tl-reading ${r.quality === "CHECK_ZERO" ? "tl-flagged" : ""}">
+      <div class="tl-readings">${metrics.length ? metrics.map(r=>`<div class="tl-reading ${r.quality === "CHECK_ZERO" ? "tl-flagged" : ""} ${r.stale ? "tl-stale" : ""}">
         <span>${esc(r.name)}</span>${readingValue(r)}
         ${compact ? "" : `<small>${esc(quality(r))}</small><time>${esc(date(r.sample_time))}</time>`}
-      </div>`).join("") : '<p class="tl-empty">厂家数据已过期，当前无可展示的实时读数；历史记录仍可查看。</p>'}</div>
-      ${compact && metrics.length ? `<div class="tl-meta">${metrics.some(r=>r.quality === "CHECK_ZERO") ? "土壤零值待核查 · " : ""}${image ? "含识别图片 · " : ""}采集时间 ${esc(date(Math.max(0,...metrics.map(r=>r.sample_time))))}</div>` : ""}
+      </div>`).join("") : '<p class="tl-empty">厂家尚未返回可读指标；未填入仿真读数。</p>'}</div>
+      ${compact && metrics.length ? `<div class="tl-meta">${showingStaleOnly ? "展示最近入库厂家读数 · " : ""}${metrics.some(r=>r.quality === "CHECK_ZERO") ? "土壤零值待核查 · " : ""}${image ? "含识别图片 · " : ""}采集时间 ${esc(date(Math.max(0,...metrics.map(r=>r.sample_time))))}</div>` : ""}
     </article>`;
     }).join("");
   }
@@ -179,7 +188,10 @@
       const message = document.getElementById("tl-status");
       if (message) {
         message.classList.add("tl-warn");
-        message.textContent = "无法读取真实数据服务。请使用 start.bat 启动平台；连接中断期间不更新读数。";
+        const base = (global.FarmApiBase && global.FarmApiBase.base) || "";
+        message.textContent = base
+          ? `无法连接数据服务（${base}）。请检查网络或稍后刷新；连接中断期间不更新读数。`
+          : "无法读取真实数据服务。本机请先启动后端；连接中断期间不更新读数。";
       }
       const stale = document.getElementById("tl-devices");
       if (snapshot && stale) stale.innerHTML = cards(snapshot.devices.map(d=>({...d,status_stale:true,readings:d.readings.map(r=>({...r,stale:true}))})), page === "dashboard");

@@ -236,13 +236,19 @@ def normalized(row: dict, did: str, now_ms: int) -> dict:
     if not prop or isinstance(stamp, bool) or not isinstance(stamp, (int, float)) or not math.isfinite(stamp):
         raise VendorError("数据缺少有效指标或采集时间")
     stamp = int(stamp)
+    # Vendor / device clocks often run several minutes ahead of the server.
+    # Allow up to 30 minutes of future skew before rejecting the sample.
+    max_future_ms = 30 * 60 * 1000
     # Some vendor gateways return Unix seconds while the documented API and
     # storage contract use milliseconds.  Accept only a plausible seconds
     # value, then retain the single millisecond representation internally.
-    if 946684800 <= stamp <= (now_ms + 300000) // 1000:
+    if 946684800 <= stamp <= (now_ms + max_future_ms) // 1000:
         stamp *= 1000
-    if stamp < 946684800000 or stamp > now_ms + 300000:
+    if stamp < 946684800000 or stamp > now_ms + max_future_ms:
         raise VendorError("采集时间异常，未写入最新读数")
+    # Clamp mild future skew so stale-age math and UI clocks stay sane.
+    if stamp > now_ms:
+        stamp = now_ms
     value = row.get("value", row.get("numberValue"))
     if value is None and isinstance(row.get("geoValue"), dict):
         value = row.get("geoValue")
