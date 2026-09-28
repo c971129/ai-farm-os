@@ -81,13 +81,15 @@ JSDMirror / jsDelivr 对 GitHub 的稳定引用应使用 **tag 或 commit**，�
 把占位符换成真实仓库：
 
 ```text
-https://cdn.jsdmirror.com/gh/<owner>/<repo>@v1.2.0-cdn/frontend/index.html
+https://cdn.jsdmirror.com/gh/c971129/ai-farm-os@v1.2.0-cdn/frontend/index.html
 ```
+
+公开仓：https://github.com/c971129/ai-farm-os（`v1.2.0-cdn` 已推送）。
 
 资源链接示例：
 
 ```text
-https://cdn.jsdmirror.com/gh/<owner>/<repo>@v1.2.0-cdn/frontend/assets/app.js
+https://cdn.jsdmirror.com/gh/c971129/ai-farm-os@v1.2.0-cdn/frontend/assets/app.js
 ```
 
 验证：浏览器打开上述 `index.html`，开发者工具 Network 中 `/api/health` 应对准 `farm.yijxj.com`，状态 200。
