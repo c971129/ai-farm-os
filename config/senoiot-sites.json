@@ -1,0 +1,25 @@
+{
+  "source": "user_confirmed",
+  "confirmed_on": "2026-09-18",
+  "note": "按用户确认的设备归属和地址维护。地块边界、经纬度和测绘面积另行维护。",
+  "map_center": [45.43288, 84.93065],
+  "devices": {
+    "864317086515478": {
+      "organization": "新疆一级芯界人工智能有限公司",
+      "site_name": "2000亩试验田",
+      "address": "中国新疆维吾尔自治区克拉玛依市克拉玛依区白云一路与蓝天二路交叉口",
+      "device_kind": "weather"
+    },
+    "864317086512400": {
+      "organization": "新疆一级芯界人工智能有限公司",
+      "site_name": "2000亩试验田",
+      "address": "中国新疆维吾尔自治区克拉玛依市克拉玛依区白云一路与蓝天二路交叉口",
+      "device_kind": "soil",
+      "metrics": [
+        {"property": "AiMitrwd", "name": "土壤温度", "unit": "℃"},
+        {"property": "AiMitrsd", "name": "土壤湿度", "unit": "%"},
+        {"property": "AiMitrEC", "name": "土壤 EC", "unit": "μS/cm"}
+      ]
+    }
+  }
+}

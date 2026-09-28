@@ -1,0 +1,17 @@
+[Unit]
+Description=AI Farm OS (single-worker live API + telemetry)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ai-farm-os
+EnvironmentFile=-/opt/ai-farm-os/.env
+ExecStart=/opt/ai-farm-os/.venv/bin/python -m backend.run --no-browser --port 8080
+Restart=on-failure
+RestartSec=5
+# 采集与 SQLite：禁止多 worker / 多实例抢同一 data/
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

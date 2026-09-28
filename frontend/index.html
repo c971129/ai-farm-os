@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>一级芯界 AI Farm OS</title>
+  <!-- 拆分部署：填写后端 HTTPS 根地址（无尾斜杠），例如 https://farm.yijxj.com；本机同域可留空。亦可用 ?api=https://farm.yijxj.com 临时覆盖。 -->
+  <meta name="ai-farm-api-base" content="https://farm.yijxj.com" />
+  <link rel="preconnect" href="https://fonts.font.im" crossorigin />
+  <link href="https://fonts.font.im/css2?family=Exo+2:wght@500;600;700&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles.css?v=213" />
+  <link rel="stylesheet" href="assets/telemetry.css?v=218" />
+  <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css?v=213" />
+  <link rel="stylesheet" href="assets/ai-runtime.css?v=215" />
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <div id="topbar">
+    <div class="logo">
+      <span class="mark">芯</span>
+      <div class="logo-text">
+        <strong>一级芯界</strong>
+        <em>农场管理平台</em>
+      </div>
+    </div>
+    <select class="farm-select" id="farmSelect" title="切换农场" aria-label="切换农场">
+      <option value="f1">克拉玛依试验田</option>
+      <option value="f2">阿克苏</option>
+      <option value="f3">石河子</option>
+    </select>
+    <div class="sp"></div>
+    <!-- 现场状态组：今天能不能下地、田里的眼睛还在不在线 -->
+    <div class="tb-signal">
+      <button type="button" class="tb-sig" id="tbWindow" data-tone="unknown">
+        <i aria-hidden="true"></i>
+        <span class="tb-sig-k">作业窗口</span>
+        <b class="tb-sig-v">待核验</b>
+      </button>
+      <button type="button" class="tb-sig" id="tbDevices" data-tone="unknown">
+        <i aria-hidden="true"></i>
+        <span class="tb-sig-k">设备在线</span>
+        <b class="tb-sig-v">--</b>
+      </button>
+    </div>
+    <span class="tb-div" aria-hidden="true"></span>
+    <!-- 工具组 -->
+    <div class="tb-tools">
+      <button class="icon-btn" id="refresh-page" title="重新拉取当前数据" aria-label="重新拉取当前数据" type="button">↻</button>
+      <button class="icon-btn" id="theme-toggle" title="切换浅色/深色主题" aria-label="切换浅色或深色主题" type="button">☾</button>
+      <button class="icon-btn" id="notif-btn" title="通知中心" aria-label="通知中心" type="button" aria-haspopup="dialog" aria-controls="notif-panel" aria-expanded="false">
+        <span class="ico-bell" aria-hidden="true"></span>
+        <span class="badge-dot" id="notif-badge">0</span>
+      </button>
+    </div>
+    <span class="tb-div" aria-hidden="true"></span>
+    <button class="btn ghost wall-btn" id="wall-toggle" title="态势大屏模式" aria-label="打开态势大屏" data-short="大屏" type="button">态势大屏</button>
+    <!-- 整块即切换器：下拉框透明铺满，点哪儿都能换视角，不再重复显示一遍角色名 -->
+    <div class="user-role" title="切换视角">
+      <div class="avatar" id="roleAvatar" aria-hidden="true">农</div>
+      <div class="user-role-meta">
+        <div class="user-role-name" id="roleLabel">农户/场长</div>
+      </div>
+      <span class="user-role-caret" aria-hidden="true"></span>
+      <select id="roleSelect" aria-label="切换视角">
+        <option value="farm">农户/场长</option>
+        <option value="expert">农技专家</option>
+        <option value="gov">监管人员</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="notif-panel" role="dialog" aria-label="通知中心" aria-hidden="true" tabindex="-1"></div>
+  <div id="cmd-panel" role="dialog" aria-modal="true" aria-label="全局搜索" aria-hidden="true">
+    <div class="cmd-box">
+      <input id="cmd-input" aria-label="搜索田块、待办或机具" placeholder="搜田块、待办、机具…（Ctrl+K）" autocomplete="off" />
+      <div id="cmd-list"></div>
+    </div>
+  </div>
+
+  <dialog id="evidence-dialog" class="evidence-dialog" aria-labelledby="evidence-dialog-title" aria-describedby="evidence-dialog-desc">
+    <form id="evidence-form" novalidate>
+      <div class="evidence-dialog-head">
+        <div>
+          <span class="evidence-kicker" id="evidence-dialog-kicker">作业前核验</span>
+          <h2 id="evidence-dialog-title">提交核验信息</h2>
+        </div>
+        <button type="button" class="icon-btn" id="evidence-dialog-x" aria-label="关闭核验对话框">×</button>
+      </div>
+      <p id="evidence-dialog-desc" class="sub"></p>
+      <div id="evidence-fields" class="evidence-fields"></div>
+      <div id="evidence-error" class="evidence-error" role="alert" aria-live="polite"></div>
+      <div class="evidence-dialog-actions">
+        <button type="button" class="btn ghost" id="evidence-dialog-cancel">取消</button>
+        <button type="submit" class="btn" id="evidence-dialog-submit">确认记录</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="layout">
+    <aside id="sidebar">
+      <div class="side-head">
+        <button type="button" class="side-toggle" id="sideToggle" title="收起侧栏" aria-label="收起侧栏" aria-expanded="true">
+          <span class="side-toggle-label" id="sideToggleLabel">收起侧栏</span>
+          <span class="side-toggle-ico" aria-hidden="true">‹</span>
+        </button>
+      </div>
+      <nav id="nav" aria-label="主功能导航"></nav>
+    </aside>
+    <main id="main" tabindex="-1">
+      <div class="page-title" id="pageHead">
+        <h1 id="pageTitle" tabindex="-1">本周农事</h1>
+        <span class="page-path" id="pagePath" hidden></span>
+        <span class="crumb inline" id="crumb" hidden></span>
+        <span class="sub-t" id="pageSub">本周 · 完成 --%</span>
+        <div class="page-env" id="pageEnv" hidden></div>
+      </div>
+      <div id="telemetry-root" hidden></div>
+      <div id="view"></div>
+    </main>
+  </div>
+
+  <div id="toast-wrap" role="status" aria-live="polite" aria-atomic="false"></div>
+  <div id="wall-root" role="dialog" aria-modal="true" aria-label="态势大屏" aria-hidden="true" tabindex="-1"></div>
+
+  <script src="assets/api-base.js?v=219"></script>
+  <script src="assets/vendor/leaflet/leaflet.js?v=213"></script>
+  <script src="assets/farm-geo.js?v=213"></script>
+  <script src="assets/spec.js?v=213"></script>
+  <script src="assets/equipment-catalog.js?v=213"></script>
+  <script src="assets/engine.js?v=213"></script>
+  <script src="assets/mxsj-agents.js?v=213"></script>
+  <script src="assets/telemetry.js?v=219"></script>
+  <script src="assets/ai-runtime.js?v=219"></script>
+  <script src="assets/app.js?v=219"></script>
+  <script src="assets/wall.js?v=215"></script>
+</body>
+</html>

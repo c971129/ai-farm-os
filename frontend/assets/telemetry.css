@@ -1,0 +1,58 @@
+#telemetry-root { margin: 0 0 24px; }
+.tl-panel { padding: 24px; border: 1px solid var(--line, #cbd9d0); border-top: 4px solid #1f6b4a; border-radius: 16px; background: var(--panel, #fff); color: var(--ink, #14201a); }
+.tl-panel h2 { margin: 5px 0 0; font-size: 24px; }
+.tl-panel h3 { margin: 0; font-size: 18px; }
+.tl-eyebrow { color: #226e50; font-size: 14px; font-weight: 700; }
+.tl-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.tl-status, .tl-note { font-size: 14px; line-height: 1.7; margin: 14px 0; }
+.tl-note { color: var(--muted, #5c6b62); }
+/* 面板顶栏操作区：与全局 .btn（32px）对齐，避免被 .tl-panel button 的 44px 撑高 */
+.tl-strip-ops { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tl-strip-ops .btn { min-height: 32px; height: 32px; margin-right: 0; }
+.tl-devices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.tl-device { border: 1px solid var(--line, #d5ded6); border-radius: 12px; padding: 16px; min-width: 0; }
+.tl-meta { color: var(--muted, #5c6b62); font-size: 14px; line-height: 1.6; margin: 8px 0; overflow-wrap: anywhere; }
+.tl-tag { display: inline-block; border: 1px solid currentColor; border-radius: 5px; font-size: 14px; padding: 2px 8px; color: #1f6b4a; }
+.tl-readings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.tl-reading { display: flex; flex-direction: column; gap: 5px; padding: 10px; border-radius: 8px; background: #edf5ef; min-width: 0; overflow-wrap: anywhere; }
+.tl-reading > span { font-size: 14px; }
+.tl-reading strong { font-size: 23px; font-variant-numeric: tabular-nums; }
+.tl-reading small, .tl-reading time { font-size: 12px; line-height: 1.6; }
+.tl-reading.tl-flagged { background: #fff3d8; color: #744300; }
+.tl-pest-thumb { display: block; margin: 10px 0 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--line, #d5ded6); max-width: 100%; }
+.tl-pest-thumb img { display: block; width: 100%; max-height: 220px; object-fit: cover; background: #edf5ef; }
+.tl-pest .tl-reading strong { font-size: 18px; line-height: 1.35; }
+.tl-warn { color: #965200; }
+.tl-history { border-top: 1px solid var(--line, #d5ded6); padding-top: 18px; }
+.tl-filters { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.tl-filters label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+/* min-width 是必须的：下拉框宽度由最长选项撑开，只剩一条占位项（或一条都没有）时
+   会塌成 38px 的一个箭头，和旁边 116px 的「时间范围」挤在一起像是排版坏了。 */
+.tl-filters select { min-height: 44px; min-width: 170px; padding: 8px; border: 1px solid var(--line, #cbd9d0); border-radius: 6px; background: var(--panel, #fff); color: inherit; max-width: 100%; }
+.tl-filters select:disabled { color: var(--text3, #6b7a70); cursor: not-allowed; opacity: 1; }
+.tl-panel button { min-height: 44px; }
+.tl-panel :focus-visible { outline: 3px solid #3a7ca5; outline-offset: 3px; }
+.tl-chart { display: block; width: 100%; height: auto; min-height: 180px; }
+.tl-chart text { fill: currentColor; font-size: 13px; }
+.tl-gridline { stroke: #b9cabc; stroke-width: .5; }
+.tl-line { fill: none; stroke: #1f8057; stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.tl-point { fill: #1f8057; }
+.tl-table-wrap { overflow-x: auto; }
+.tl-table-wrap table { width: 100%; text-align: left; border-collapse: collapse; font-size: 14px; }
+.tl-table-wrap th, .tl-table-wrap td { padding: 10px; border-bottom: 1px solid var(--line, #d5ded6); white-space: nowrap; }
+.tl-panel summary { cursor: pointer; font-size: 14px; padding: 10px 0; }
+.tl-empty { font-size: 16px; padding: 20px 0; }
+:root[data-theme="dark"] .tl-panel { background: #14251d; color: #edf5ef; border-color: #355444; }
+:root[data-theme="dark"] .tl-reading { background: #203c2e; }
+:root[data-theme="dark"] .tl-reading.tl-flagged { background: #4b3716; color: #ffdc95; }
+:root[data-theme="dark"] .tl-eyebrow, :root[data-theme="dark"] .tl-tag { color: #8cddb3; }
+:root[data-theme="dark"] .tl-warn { color: #ffcf7d; }
+:root[data-theme="dark"] .tl-meta, :root[data-theme="dark"] .tl-note { color: #bccdc2; }
+:root[data-theme="dark"] .tl-filters select { background: #203c2e; }
+@media (max-width: 1200px) { .tl-devices { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 1050px) { .tl-devices { grid-template-columns: 1fr; } }
+@media (max-width: 600px) {
+  .tl-panel { padding: 14px; } .tl-readings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tl-filters { display: grid; grid-template-columns: minmax(0, 1fr); } .tl-filters select { width: 100%; }
+  .tl-chart { min-height: 150px; } .tl-panel h2 { font-size: 22px; }
+}
