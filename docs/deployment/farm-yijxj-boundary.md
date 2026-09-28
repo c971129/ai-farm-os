@@ -23,17 +23,12 @@
 - `ai-farm-os` 与 Nginx 均为 `active`。
 - `Host: farm.yijxj.com` 的 `/` 与 `/api/health` 均返回 HTTP 200。
 
-## 公开访问前置条件
+## 公开访问（现行）
 
-本次未变更 DNS、未提交备案。公开发布前，需要在备案允许新网站/接入 IP 后创建记录：
-
-```text
-记录类型：A
-主机记录：farm
-记录值：47.94.243.26
-```
-
-DNS 生效后再申请并安装 `farm.yijxj.com` 的 HTTPS 证书；不要将根域或 `www` 指向此新实例。
+- **页面入口：** https://c971129.github.io/ai-farm-os/（GitHub Pages；不依赖 `yijxj.com` DNS）  
+- **API 主机：** `farm.lcxlwh.com` A → `47.94.243.26`，HTTPS（Let’s Encrypt）已装  
+- `yijxj.com` DNS 不在本运维账号下，**不再**把公网联调卡在 `farm.yijxj.com`  
+- 不要将根域 `yijxj.com` / `www` 指向此新实例
 
 ## 相关手册
 
