@@ -19,18 +19,19 @@
 
 ## 后端 47.94.243.26
 
-- [ ] `/opt/ai-farm-os` 代码与 venv 按本方案就绪/更新
-- [ ] `.env` 权限 600，含 Senoiot
-- [ ] `AI_FARM_ALLOWED_ORIGINS` 含 `https://c971129.github.io`（以及按需 `https://cdn.jsdmirror.com`、`https://farm.yijxj.com`）
-- [ ] `systemctl is-active ai-farm-os` → active
-- [ ] `nginx -t` 通过且站点已 reload
-- [ ] `curl https://farm.yijxj.com/api/health` → 200 / running
+- [x] `/opt/ai-farm-os` 代码已用云助手自公开仓同步（venv=`/opt/ai-farm-venv`，非系统 python3）
+- [ ] `.env` 权限 600，Senoiot 生产密钥已核验
+- [x] `AI_FARM_ALLOWED_ORIGINS` 含 `https://c971129.github.io`（以及 `farm` / `yijxj.icu` 等）
+- [x] `systemctl is-active ai-farm-os` → active
+- [x] Nginx 对 `Host: farm.yijxj.com` 反代本机 8080（HTTP 冒烟通过）
+- [ ] `curl https://farm.yijxj.com/api/health` → 200 / running（依赖公网 DNS + 证书）
+- [x] 替代冒烟：`curl -H 'Host: farm.yijxj.com' -H 'Origin: https://c971129.github.io' http://47.94.243.26/api/health` → 200 + CORS
 
 ## 浏览器联调
 
-- [ ] 从 Pages 打开前端
+- [ ] 从 Pages 打开前端（卡在 `https://farm.yijxj.com` 不可解析/无证书）
 - [ ] `/api/health`、遥测请求发往 `farm.yijxj.com`
-- [ ] CORS 无红字（Origin = `https://c971129.github.io`）
+- [x] 服务端 CORS 已对 Pages Origin 放行（浏览器 E2E 仍待 DNS/HTTPS）
 - [ ] 厂家观测有数据或明确「等待首次同步」
 - [ ] 页面不可见厂家密码
 
