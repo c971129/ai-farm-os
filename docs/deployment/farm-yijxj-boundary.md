@@ -37,6 +37,8 @@ DNS 生效后再申请并安装 `farm.yijxj.com` 的 HTTPS 证书；不要将根
 
 ## 相关手册
 
-若采用「公开 GitHub + JSDMirror 只托管前端、API 留在本实例」方案，完整步骤见：
+若采用「公开 GitHub + Pages/JSDMirror 前端、API 留在本实例」方案，完整步骤与**进度勾选**见：
 
 [`public-repo-jsdmirror-backend-47.md`](./public-repo-jsdmirror-backend-47.md)
+
+前端公开入口（已完成）：https://c971129.github.io/ai-farm-os/
