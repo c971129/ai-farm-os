@@ -76,7 +76,17 @@ git push origin v1.2.0-cdn
 
 JSDMirror / jsDelivr 对 GitHub 的稳定引用应使用 **tag 或 commit**，避免长期依赖浮动 `main`（缓存与回滚更清晰）。
 
-### 3.4 前端访问地址
+### 3.4 前端访问地址（GitHub Pages，推荐入口）
+
+浏览器请打开（会正确渲染 HTML，不要用 JSDMirror 直接打开 `index.html`）：
+
+```text
+https://c971129.github.io/ai-farm-os/
+```
+
+JSDMirror 仅用于加速 JS/CSS 等静态库；HTML 入口必须由 Pages / 自有域名提供 `text/html`。
+
+## 3.5 JSDMirror 资源路径（非页面入口）
 
 把占位符换成真实仓库：
 
